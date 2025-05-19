@@ -1,18 +1,20 @@
+import asyncio
+import logging
 import os
 import sys
 from pathlib import Path
 
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
 import anyio
-
-from browser_use.agent.views import ActionResult
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import asyncio
-import logging
-
 from langchain_openai import ChatOpenAI
 
 from browser_use import Agent, Controller
+from browser_use.agent.views import ActionResult
 from browser_use.browser.browser import Browser, BrowserConfig
 from browser_use.browser.context import BrowserContext
 
@@ -70,7 +72,7 @@ async def read_file(path: str, available_file_paths: list[str]):
 	if path not in available_file_paths:
 		return ActionResult(error=f'File path {path} is not available')
 
-	async with (await anyio.open_file(path, 'r')) as f:
+	async with await anyio.open_file(path, 'r') as f:
 		content = await f.read()
 	msg = f'File content: {content}'
 	logger.info(msg)
